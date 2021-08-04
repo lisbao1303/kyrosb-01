@@ -22,41 +22,49 @@ public class ClienteService {
     EnderecoRepository enderecoRepository;
 
     @Transactional
-    public ClienteDTO cadastrarCliente(ClienteDTO model) {
+    public ClienteDTO cadastrarCliente(ClienteDTO model) throws Exception {
         Cliente cliente = new Cliente();
         Endereco endereco = new Endereco();
 
-        cliente.setCpf(model.getCpf());
-        cliente.setData_nascimento(model.getData_nascimento());
-        cliente.setNome(model.getNome());
-        cliente.setEmail(model.getEmail());
-        cliente.setTelefone(model.getTelefone());
+        try {
+            cliente.setCpf(model.getCpf());
+            cliente.setData_nascimento(model.getData_nascimento());
+            cliente.setNome(model.getNome());
+            cliente.setEmail(model.getEmail());
+            cliente.setTelefone(model.getTelefone());
 
-        clienteRepository.save(cliente);
-        enderecoRepository.saveAll(model.getEnderecos());
+            clienteRepository.save(cliente);
+            enderecoRepository.saveAll(model.getEnderecos());
 
-        return model;
+            return model;
+
+        } catch (Exception e) {
+            throw new Exception("Não foi possivel realizar o cadastro", e);
+        }
+
     }
 
     @Transactional
-    public List<ClienteDTO> todosClientes() {
+    public List<ClienteDTO> todosClientes() throws Exception {
         List<ClienteDTO> model = new ArrayList<>();
         List<Cliente> clientes = clienteRepository.findAll();
         List<Endereco> todosEnderecos = enderecoRepository.findAll();
-
-        clientes.forEach(cliente -> {
-            ClienteDTO clienteDTO = new ClienteDTO();
-            clienteDTO.setCpf(cliente.getCpf());
-            clienteDTO.setData_nascimento(cliente.getData_nascimento());
-            clienteDTO.setNome(cliente.getNome());
-            clienteDTO.setEmail(cliente.getEmail());
-            clienteDTO.setTelefone(cliente.getTelefone());
-            List<Endereco> enderecos = todosEnderecos.stream().filter(p -> p.getCpf_cliente().equals(cliente.getCpf())).collect(Collectors.toList());
-            clienteDTO.setEnderecos(enderecos);
-            model.add(clienteDTO);
-        });
-
-        return model;
+        try {
+            clientes.forEach(cliente -> {
+                ClienteDTO clienteDTO = new ClienteDTO();
+                clienteDTO.setCpf(cliente.getCpf());
+                clienteDTO.setData_nascimento(cliente.getData_nascimento());
+                clienteDTO.setNome(cliente.getNome());
+                clienteDTO.setEmail(cliente.getEmail());
+                clienteDTO.setTelefone(cliente.getTelefone());
+                List<Endereco> enderecos = todosEnderecos.stream().filter(p -> p.getCpf_cliente().equals(cliente.getCpf())).collect(Collectors.toList());
+                clienteDTO.setEnderecos(enderecos);
+                model.add(clienteDTO);
+            });
+            return model;
+        } catch (Exception e) {
+            throw new Exception("Não encontrado", e);
+        }
     }
 
     @Transactional
@@ -104,28 +112,37 @@ public class ClienteService {
     }
 
     @Transactional
-    public ClienteDTO clienteByCPF(String cpf_cliente) {
-        var clienteBanco = clienteRepository.findById(cpf_cliente);
+    public ClienteDTO clienteByCPF(String cpf_cliente) throws Exception {
         ClienteDTO clienteDTO = new ClienteDTO();
 
-        if (clienteBanco.isPresent()) {
-            var cliente = clienteBanco.get();
+        try {
+            var clienteBanco = clienteRepository.findById(cpf_cliente);
+            if (clienteBanco.isPresent()) {
+                var cliente = clienteBanco.get();
 
-            clienteDTO.setCpf(cliente.getCpf());
-            clienteDTO.setData_nascimento(cliente.getData_nascimento());
-            clienteDTO.setNome(cliente.getNome());
-            clienteDTO.setEmail(cliente.getEmail());
-            clienteDTO.setTelefone(cliente.getTelefone());
-            clienteDTO.setEnderecos(enderecoRepository.findByCpfClienteContains(cpf_cliente));
+                clienteDTO.setCpf(cliente.getCpf());
+                clienteDTO.setData_nascimento(cliente.getData_nascimento());
+                clienteDTO.setNome(cliente.getNome());
+                clienteDTO.setEmail(cliente.getEmail());
+                clienteDTO.setTelefone(cliente.getTelefone());
+                clienteDTO.setEnderecos(enderecoRepository.findByCpfClienteContains(cpf_cliente));
+            }
+
+            return clienteDTO;
+        } catch (Exception e) {
+            throw new Exception("Não encontrado", e);
         }
 
-        return clienteDTO;
     }
 
     @Transactional
-    public void deletaCliente(String cpf_cliente) {
-        clienteRepository.deleteById(cpf_cliente);
-        enderecoRepository.deleteAllByCpfCliente(cpf_cliente);
+    public void deletaCliente(String cpf_cliente) throws Exception {
+        try{
+            clienteRepository.deleteById(cpf_cliente);
+            enderecoRepository.deleteAllByCpfCliente(cpf_cliente);
+        } catch (Exception e) {
+            throw new Exception("Não encontrado", e);
+        }
     }
 
     public void deletaEndereco(Long id) {

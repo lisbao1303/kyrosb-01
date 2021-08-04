@@ -19,13 +19,13 @@ public class ClienteController {
     ClienteService service;
 
     @PostMapping("/novo")
-    public ClienteDTO cadastrarCliente(@RequestBody ClienteDTO model){
+    public ClienteDTO cadastrarCliente(@RequestBody ClienteDTO model) throws Exception {
         return service.cadastrarCliente(model);
     }
 
     @CrossOrigin
     @GetMapping("/obtertodos")
-    public List<ClienteDTO> todosClientes(){
+    public List<ClienteDTO> todosClientes() throws Exception {
         return service.todosClientes();
     }
 
@@ -35,12 +35,12 @@ public class ClienteController {
     }
 
     @GetMapping("/{cpf}")
-    public ClienteDTO clienteByCPF(@PathVariable("cpf") String cpf_cliente) {
+    public ClienteDTO clienteByCPF(@PathVariable("cpf") String cpf_cliente) throws Exception {
         return service.clienteByCPF(cpf_cliente);
     }
 
     @DeleteMapping("/{cpf}")
-    public void deletaCliente(@PathVariable("cpf") String cpf){
+    public void deletaCliente(@PathVariable("cpf") String cpf) throws Exception {
          service.deletaCliente(cpf);
     }
 
