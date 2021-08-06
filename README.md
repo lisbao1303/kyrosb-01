@@ -52,11 +52,11 @@ Para executar a API spring é necessario em uma IDE com Maven instalar os pacote
 
 Depois setar a configuração para executar a aplicação spring:
 
-![alt text](http://stackview.com.br/kyros1.PNG)
+![alt text](https://stackview.com.br/kyros1.PNG)
 
 E caso ocorra um erro de configuração do maven, especificar a pasta onde o maven está instalado nas configurções da IDE:
 
-![alt text](http://stackview.com.br/kyros2.PNG)
+![alt text](https://stackview.com.br/kyros2.PNG)
 
 Feito isso é so Build e Run na CadastroApiApplication.java
 
