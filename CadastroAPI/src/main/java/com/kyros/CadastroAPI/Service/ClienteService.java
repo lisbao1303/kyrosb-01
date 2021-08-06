@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,7 +25,6 @@ public class ClienteService {
     @Transactional
     public ClienteDTO cadastrarCliente(ClienteDTO model) throws Exception {
         Cliente cliente = new Cliente();
-        Endereco endereco = new Endereco();
 
         try {
             cliente.setCpf(model.getCpf());
@@ -68,7 +68,7 @@ public class ClienteService {
     }
 
     @Transactional
-    public void atualizaCliente(ClienteDTO model) throws Exception {
+    public boolean atualizaCliente(ClienteDTO model) throws Exception {
         var clienteAnterior = clienteRepository.findById(model.getCpf());
 
         try {
@@ -87,10 +87,11 @@ public class ClienteService {
 
             //Atualiza Endereços do Cliente
             model.getEnderecos().forEach(endereco -> {
-                var enderecoAnterior = enderecoRepository.findById(endereco.getId());
+                var enderecoAnterior = new Endereco();
+                if(endereco.getId()!=null) enderecoAnterior = enderecoRepository.findById(endereco.getId()).get();
 
-                if (enderecoAnterior.isPresent()) {
-                    var enderecoNovo = enderecoAnterior.get();
+                if (enderecoAnterior.getId()!=null) {
+                    var enderecoNovo = enderecoAnterior;
 
                     enderecoNovo.setCep(endereco.getCep());
                     enderecoNovo.setLogradouro(endereco.getLogradouro());
@@ -103,9 +104,12 @@ public class ClienteService {
                     enderecoNovo.setIs_primario(endereco.getIs_primario());
 
                     enderecoRepository.save(enderecoNovo);
+                }else{
+                    enderecoRepository.save(endereco);
                 }
             });
 
+            return true;
         } catch (Exception e) {
             throw new Exception("Não encontrado", e);
         }
@@ -136,21 +140,32 @@ public class ClienteService {
     }
 
     @Transactional
-    public void deletaCliente(String cpf_cliente) throws Exception {
+    public boolean deletaCliente(String cpf_cliente) throws Exception {
         try{
             clienteRepository.deleteById(cpf_cliente);
-            enderecoRepository.deleteAllByCpfCliente(cpf_cliente);
+            enderecoRepository.findByCpfClienteContains(cpf_cliente).forEach(
+                    endereco -> {
+                        enderecoRepository.deleteById(endereco.getId());
+                    }
+            );
+            return true;
         } catch (Exception e) {
             throw new Exception("Não encontrado", e);
         }
     }
 
-    public void deletaEndereco(Long id) {
-        enderecoRepository.deleteById(id);
+    public boolean deletaEndereco(Long id) throws Exception {
+
+        try{
+            enderecoRepository.deleteById(id);
+            return true;
+        }catch (Exception e) {
+            throw new Exception("Não encontrado", e);
+        }
     }
 
     @Transactional
-    public void atualizaEndereco(Endereco endereco) throws Exception {
+    public boolean atualizaEndereco(Endereco endereco) throws Exception {
         var enderecoAnterior = enderecoRepository.findById(endereco.getId());
 
         try {
@@ -169,14 +184,14 @@ public class ClienteService {
 
                 enderecoRepository.save(enderecoNovo);
             }
+            return true;
         } catch (Exception e) {
             throw new Exception("Não encontrado", e);
         }
     }
 
     @Transactional
-    public void atualizaEnderecoPrincipal(Long id) throws Exception {
-
+    public boolean atualizaEnderecoPrincipal(Long id) throws Exception {
         try {
             var novoPrincipalBD = enderecoRepository.findById(id);
             if (novoPrincipalBD.isPresent()) {
@@ -187,6 +202,7 @@ public class ClienteService {
                 novoPrincipal.setIs_primario("S");
                 enderecoRepository.save(novoPrincipal);
             }
+            return true;
         } catch (Exception e) {
             throw new Exception("Não encontrado", e);
         }

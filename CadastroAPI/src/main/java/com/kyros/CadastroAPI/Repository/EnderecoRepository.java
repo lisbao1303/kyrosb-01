@@ -13,9 +13,6 @@ public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
     @Query(value = "SELECT * FROM endereco WHERE cpf_cliente = ?1", nativeQuery = true)
     List<Endereco> findByCpfClienteContains(String cpf_cliente);
 
-    @Query(value = "DELETE FROM endereco WHERE cpf_cliente = ?1", nativeQuery = true)
-    void deleteAllByCpfCliente(String cpf_cliente);
-
     @Query(value = "SELECT * FROM endereco WHERE cpf_cliente = ?1 AND is_primario = 'S' ", nativeQuery = true)
     Endereco enderecoPrincipal(String cpf_cliente);
 }
