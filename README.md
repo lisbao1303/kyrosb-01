@@ -2,8 +2,11 @@
 Backend CadastroAPI
 
 O projeto da API é spring boot, usei intellij IDE para programar ele.
+
 Comunica com um banco MySQL na porta 3306 local. 
+
 Utilizei o Wampserver64 para criar o servidor e o MySql Workbench para criar o database e tabelas:
+
 Segue o SQL utilizado para criação:
 
 CREATE DATABASE basec;
@@ -37,8 +40,13 @@ CREATE TABLE Endereco (
 Dessa forma no Spring as propriedades da aplicação estao definidas como:
 
 spring.datasource.url=jdbc:mysql://localhost:3306/basec
+
 spring.datasource.username=root
+
 spring.datasource.password=
 
+
 Sem senha.
+
+
 
